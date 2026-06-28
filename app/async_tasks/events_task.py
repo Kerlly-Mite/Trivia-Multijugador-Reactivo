@@ -1,13 +1,18 @@
 import asyncio
+
 from app.state.store import state
+
 
 async def events_task():
 
-    global state
-
     while True:
+
         await asyncio.sleep(20)
 
-        state.scores["Katherine"] = state.scores.get("Katherine", 0) + 10
+        puntos = state.scores.get("Katherine", 0)
 
-        print("Evento especial: bonus aplicado")
+        state.scores["Katherine"] = puntos + 10
+
+        print(
+            f"⭐ Bonus para Katherine: {state.scores['Katherine']}"
+        )
