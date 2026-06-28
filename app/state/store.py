@@ -1,7 +1,5 @@
-from app.state.reducer import update
 from app.state.game_state import GameState
 
-# Estado global del juego
 state = GameState(
     screen="home",
     players=[],
