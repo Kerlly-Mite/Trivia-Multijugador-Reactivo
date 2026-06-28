@@ -1,24 +1,48 @@
--- 1. Opcional: Asegúrate de seleccionar tu base de datos antes de ejecutar
--- USE TiendaDB;
--- GO
+-- ==========================================
+-- BASE DE DATOS: Trivia Multijugador Reactivo
+-- ==========================================
 
--- 2. Crear la tabla Productos
-CREATE TABLE Productos (
-    id INT IDENTITY(1,1) NOT NULL, -- Clave primaria autoincremental (empieza en 1 y aumenta de 1 en 1)
-    nombre VARCHAR(100) NOT NULL,  -- Nombre del producto (máximo 100 caracteres, obligatorio)
-    precio DECIMAL(10, 2) NOT NULL, -- Precio con hasta 2 decimales (ej: 99999999.99, obligatorio)
-    stock INT NOT NULL DEFAULT 0,  -- Cantidad en inventario (entero, obligatorio, por defecto 0)
-
-    -- Definición de la Clave Primaria
-    CONSTRAINT PK_Productos PRIMARY KEY CLUSTERED (id)
+-- Crear tabla de partidas
+CREATE TABLE Partidas (
+    id_partida INT IDENTITY(1,1) PRIMARY KEY,
+    ganador VARCHAR(50),
+    puntaje_ganador INT,
+    duracion_segundos INT,
+    fecha DATETIME DEFAULT GETDATE()
 );
 GO
 
--- 3. Opcional: Insertar algunos datos de prueba iniciales
-INSERT INTO Productos (nombre, precio, stock)
-VALUES
-('Memoria RAM 16GB', 65.00, 25),
-('Disco Duro SSD 1TB', 89.99, 5), -- Este saldrá en la consulta de bajo stock (< 20)
-('Monitor 24 Pulgadas', 145.50, 12); -- Este también saldrá en bajo stock
+
+-- Crear tabla de historial de eventos
+CREATE TABLE HistorialEventos (
+    id_evento INT IDENTITY(1,1) PRIMARY KEY,
+    id_partida INT,
+    descripcion VARCHAR(255),
+    fecha_hora DATETIME DEFAULT GETDATE(),
+
+    CONSTRAINT FK_Historial_Partidas
+        FOREIGN KEY (id_partida)
+        REFERENCES Partidas(id_partida)
+);
 GO
 
+
+-- Crear tabla de ranking global
+CREATE TABLE Ranking (
+    id_ranking INT IDENTITY(1,1) PRIMARY KEY,
+    jugador VARCHAR(50) NOT NULL,
+    puntos_totales INT DEFAULT 0,
+    partidas_jugadas INT DEFAULT 0,
+    victorias INT DEFAULT 0
+);
+GO
+
+
+-- Datos de prueba
+INSERT INTO Ranking
+(jugador, puntos_totales, partidas_jugadas, victorias)
+VALUES
+('Ana',120,5,3),
+('Luis',90,4,2),
+('Carlos',150,6,4);
+GO
