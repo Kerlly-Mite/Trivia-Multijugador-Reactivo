@@ -12,4 +12,12 @@ def update(state, action):
             timer=action["timer"]
         )
 
+    elif tipo == "NEXT_ROUND":
+
+        return replace(
+            state,
+            round_number=state.round_number + 1,
+            timer=30
+        )
+
     return state
