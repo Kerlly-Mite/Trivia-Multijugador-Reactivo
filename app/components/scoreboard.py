@@ -1,17 +1,33 @@
 from reactpy import component, html
+
 from app.components.player_card import PlayerCard
 
 
 @component
-def Scoreboard():
+def Scoreboard(jugadores=None):
+
+    if jugadores is None:
+
+        jugadores = [
+
+            ("Katherine",120),
+
+            ("Carlos",90),
+
+            ("María",75)
+
+        ]
 
     return html.div(
 
         html.h2("🏆 Ranking"),
 
-        PlayerCard("Katherine", 120),
+        *[
 
-        PlayerCard("Carlos", 90),
+            PlayerCard(nombre,puntaje)
 
-        PlayerCard("María", 75)
+            for nombre,puntaje in jugadores
+
+        ]
+
     )

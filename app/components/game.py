@@ -1,7 +1,8 @@
 from reactpy import component, html
 
-from app.components.question import Question
+from app.components.layout import Layout
 from app.components.timer import Timer
+from app.components.question import Question
 from app.components.scoreboard import Scoreboard
 
 
@@ -10,11 +11,18 @@ def Game():
 
     return html.div(
 
-        html.h2("Trivia Multijugador"),
+        Layout(),
+
+        html.br(),
 
         Timer(),
 
+        html.hr(),
+
         Question(),
 
+        html.hr(),
+
         Scoreboard()
+
     )

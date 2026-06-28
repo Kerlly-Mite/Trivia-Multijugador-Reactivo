@@ -2,25 +2,40 @@ from reactpy import component, html
 
 
 @component
-def Question():
+def Question(
+    pregunta="¿Cuál es la capital del Ecuador?",
+    opciones=None
+):
+
+    if opciones is None:
+
+        opciones = [
+
+            "Quito",
+
+            "Guayaquil",
+
+            "Cuenca",
+
+            "Loja"
+
+        ]
 
     return html.div(
 
         html.h2("Pregunta"),
 
-        html.p("¿Cuál es la capital del Ecuador?"),
+        html.p(pregunta),
 
-        html.button("Quito"),
+        *[
+            html.div(
 
-        html.br(),
+                html.button(opcion),
 
-        html.button("Guayaquil"),
+                html.br()
 
-        html.br(),
+            )
 
-        html.button("Cuenca"),
-
-        html.br(),
-
-        html.button("Loja")
+            for opcion in opciones
+        ]
     )
