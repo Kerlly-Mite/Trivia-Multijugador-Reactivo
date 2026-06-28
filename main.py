@@ -2,23 +2,18 @@ import asyncio
 from reactpy import run
 
 from app.components.layout import Layout
-from app.components.game import Game
-
 from app.async_tasks.timer_task import timer_task
 from app.async_tasks.round_task import round_task
 from app.async_tasks.events_task import events_task
 
 
-async def main():
-
-    # correr tareas en paralelo 
-    asyncio.create_task(timer_task())
-    asyncio.create_task(round_task())
-    asyncio.create_task(events_task())
-
-    # UI ReactPy
-    run(Layout)
+def start_async_tasks():
+    loop = asyncio.get_event_loop()
+    loop.create_task(timer_task())
+    loop.create_task(round_task())
+    loop.create_task(events_task())
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    start_async_tasks()
+    run(Layout)
