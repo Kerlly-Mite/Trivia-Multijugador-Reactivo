@@ -1,34 +1,28 @@
 from ConectionSqlCadena import SQLServerConnection
 
 
-def ejecutar_ejemplo_tradicional():
+def ejecutar_ejemplo():
 
-    # Crear conexión
     db = SQLServerConnection(
         server="localhost",
         database="TriviaDB",
-        username="sa",
-        password="123456"
+        trusted_connection=True
     )
 
     print("=== INSERTAR EVENTO EN EL HISTORIAL ===")
 
     query_insert = """
-        INSERT INTO HistorialEventos
-        (jugador, evento)
-        VALUES (?, ?)
+    INSERT INTO HistorialEventos (id_partida, descripcion)
+    VALUES (?, ?)
     """
 
     datos = (
-        "Maria",
-        "Ingreso a la sala de espera"
+        1,
+        "Jugador respondió correctamente la pregunta 3"
     )
 
     try:
-        db.execute_non_query(
-            query_insert,
-            datos
-        )
+        db.execute_non_query(query_insert, datos)
 
     except Exception:
         print("No fue posible registrar el evento.")
@@ -36,38 +30,27 @@ def ejecutar_ejemplo_tradicional():
     print("\n=== CONSULTAR HISTORIAL ===")
 
     query_select = """
-        SELECT id, jugador, evento, fecha
-        FROM HistorialEventos
+    SELECT
+        id_evento,
+        id_partida,
+        descripcion,
+        fecha_hora
+    FROM HistorialEventos
+    ORDER BY fecha_hora DESC
     """
 
     try:
 
-        resultados = db.execute_query(
-            query_select
-        )
+        resultados = db.execute_query(query_select)
 
-        if not resultados:
-            print("No existen eventos registrados.")
-
-        else:
+        for fila in resultados:
 
             print(
-                f"{'ID':<5} "
-                f"{'Jugador':<15} "
-                f"{'Evento':<35} "
-                f"{'Fecha'}"
+                f"Evento #{fila[0]} | "
+                f"Partida {fila[1]} | "
+                f"{fila[2]} | "
+                f"{fila[3]}"
             )
-
-            print("-" * 80)
-
-            for fila in resultados:
-
-                print(
-                    f"{fila[0]:<5} "
-                    f"{fila[1]:<15} "
-                    f"{fila[2]:<35} "
-                    f"{fila[3]}"
-                )
 
     except Exception as e:
         print(e)
@@ -77,4 +60,4 @@ def ejecutar_ejemplo_tradicional():
 
 
 if __name__ == "__main__":
-    ejecutar_ejemplo_tradicional()
+    ejecutar_ejemplo()

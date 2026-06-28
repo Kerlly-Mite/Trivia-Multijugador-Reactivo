@@ -1,36 +1,44 @@
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column
+from sqlalchemy import Integer
+from sqlalchemy import String
+from sqlalchemy import DateTime
+from sqlalchemy import text
+
 from SQLServerORM import SQLServerORM, Base
 
 
-# Modelo que representa la tabla HistorialEventos
 class HistorialEvento(Base):
 
     __tablename__ = "HistorialEventos"
 
-    id = Column(
+    id_evento = Column(
         Integer,
-        primary_key=True,
-        autoincrement=True
+        primary_key=True
     )
 
-    jugador = Column(
-        String(50),
+    id_partida = Column(
+        Integer,
         nullable=False
     )
 
-    evento = Column(
-        String(255),
+    descripcion = Column(
+        String,
         nullable=False
     )
 
+    # SQL Server genera automáticamente la fecha
+    fecha_hora = Column(
+        DateTime,
+        server_default=text("GETDATE()")
+    )
 
-def ejecutar_ejemplo_orm():
+
+def ejecutar_ejemplo():
 
     orm = SQLServerORM(
         server="localhost",
         database="TriviaDB",
-        username="sa",
-        password="123456"
+        trusted_connection=True
     )
 
     session = orm.get_session()
@@ -39,52 +47,45 @@ def ejecutar_ejemplo_orm():
 
         print("=== INSERTAR EVENTO CON ORM ===")
 
-        nuevo_evento = HistorialEvento(
-            jugador="Kerlly",
-            evento="Respondió correctamente la pregunta 3"
+        nuevo = HistorialEvento(
+            id_partida=1,
+            descripcion="Jugador respondió correctamente la pregunta 3"
         )
 
-        session.add(
-            nuevo_evento
-        )
-
+        session.add(nuevo)
         session.commit()
 
-        print(
-            f"Evento registrado correctamente. "
-            f"ID asignado: {nuevo_evento.id}"
-        )
+        # Recargar el objeto desde la BD para obtener la fecha generada
+        session.refresh(nuevo)
+
+        print("Evento registrado correctamente.")
+        print(f"Fecha asignada por SQL Server: {nuevo.fecha_hora}")
 
         print("\n=== CONSULTAR HISTORIAL ===")
 
-        historial = session.query(
-            HistorialEvento
+        eventos = session.query(HistorialEvento).order_by(
+            HistorialEvento.id_evento
         ).all()
 
-        for evento in historial:
+        for e in eventos:
 
             print(
-                f"[{evento.id}] "
-                f"{evento.jugador} -> "
-                f"{evento.evento}"
+                f"Evento #{e.id_evento} | "
+                f"Partida {e.id_partida} | "
+                f"{e.descripcion} | "
+                f"{e.fecha_hora}"
             )
 
     except Exception as e:
 
         session.rollback()
-
-        print(
-            f"Error durante la transacción: {e}"
-        )
+        print("Error durante la transacción:", e)
 
     finally:
 
         session.close()
-
-        print(
-            "\nSesión ORM cerrada."
-        )
+        print("\nSesión ORM cerrada.")
 
 
 if __name__ == "__main__":
-    ejecutar_ejemplo_orm()
+    ejecutar_ejemplo()
