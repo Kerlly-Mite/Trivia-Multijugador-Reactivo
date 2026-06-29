@@ -4,19 +4,13 @@ from app.components.player_card import PlayerCard
 
 
 @component
-def Scoreboard(jugadores=None):
+def Scoreboard(estado):
 
-    if jugadores is None:
-
-        jugadores = [
-
-            ("Katherine",120),
-
-            ("Carlos",90),
-
-            ("María",75)
-
-        ]
+    jugadores_ordenados = sorted(
+        estado.scores.items(),
+        key=lambda item: item[1],
+        reverse=True
+    )
 
     return html.div(
 
@@ -24,10 +18,12 @@ def Scoreboard(jugadores=None):
 
         *[
 
-            PlayerCard(nombre,puntaje)
+            PlayerCard(nombre, puntaje)
 
-            for nombre,puntaje in jugadores
+            for nombre, puntaje in jugadores_ordenados
 
+        ] if len(jugadores_ordenados) > 0 else [
+            html.p("Todavía no hay puntajes registrados.")
         ]
 
     )
