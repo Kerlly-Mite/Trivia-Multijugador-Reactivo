@@ -18,7 +18,3 @@ Sistema web de trivia multijugador desarrollado en **Python** utilizando **React
 ## 🎯 Objetivo
 
 Desarrollar una aplicación web de trivia multijugador con una interfaz reactiva, un estado global compartido, tareas asíncronas concurrentes y persistencia de información mediante una base de datos relacional.
-
-## ▶️ Estado del Proyecto
-
-🚧 En desarrollo.
