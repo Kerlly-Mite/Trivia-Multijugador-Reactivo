@@ -1,13 +1,20 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.orm import declarative_base
 import urllib
+
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.orm import sessionmaker, declarative_base
 
 
 Base = declarative_base()
 
 
 class SQLServerORM:
+    """
+    Envoltorio asíncrono sobre SQLAlchemy + aioodbc para SQL Server.
+
+    Usa create_async_engine en vez de create_engine, y AsyncSession
+    en vez de Session, para que todas las transacciones del ORM
+    sean no bloqueantes.
+    """
 
     def __init__(
         self,
@@ -28,7 +35,6 @@ class SQLServerORM:
         self.Session = None
 
         self._create_engine()
-
 
     def _create_engine(self):
 
@@ -58,22 +64,24 @@ class SQLServerORM:
         )
 
         connection_url = (
-            f"mssql+pyodbc:///?odbc_connect={params_encoded}"
+            f"mssql+aioodbc:///?odbc_connect={params_encoded}"
         )
 
         try:
 
-            self.engine = create_engine(
+            self.engine = create_async_engine(
                 connection_url,
                 echo=False
             )
 
             self.Session = sessionmaker(
-                bind=self.engine
+                bind=self.engine,
+                class_=AsyncSession,
+                expire_on_commit=False
             )
 
             print(
-                "Motor ORM configurado correctamente"
+                "Motor ORM asincrono configurado correctamente"
             )
 
         except Exception as e:
@@ -83,7 +91,6 @@ class SQLServerORM:
             )
 
             raise
-
 
     def get_session(self):
 

@@ -1,8 +1,10 @@
+import asyncio
+
 from sqlalchemy import Column
 from sqlalchemy import Integer
 from sqlalchemy import String
 from sqlalchemy import DateTime
-from sqlalchemy import text
+from sqlalchemy import text, select
 
 from SQLServerORM import SQLServerORM, Base
 
@@ -33,7 +35,7 @@ class HistorialEvento(Base):
     )
 
 
-def ejecutar_ejemplo():
+async def ejecutar_ejemplo():
 
     orm = SQLServerORM(
         server="localhost",
@@ -41,51 +43,53 @@ def ejecutar_ejemplo():
         trusted_connection=True
     )
 
-    session = orm.get_session()
+    async with orm.get_session() as session:
 
-    try:
+        try:
 
-        print("=== INSERTAR EVENTO CON ORM ===")
+            print("=== INSERTAR EVENTO CON ORM ===")
 
-        nuevo = HistorialEvento(
-            id_partida=1,
-            descripcion="Jugador respondió correctamente la pregunta 3"
-        )
-
-        session.add(nuevo)
-        session.commit()
-
-        # Recargar el objeto desde la BD para obtener la fecha generada
-        session.refresh(nuevo)
-
-        print("Evento registrado correctamente.")
-        print(f"Fecha asignada por SQL Server: {nuevo.fecha_hora}")
-
-        print("\n=== CONSULTAR HISTORIAL ===")
-
-        eventos = session.query(HistorialEvento).order_by(
-            HistorialEvento.id_evento
-        ).all()
-
-        for e in eventos:
-
-            print(
-                f"Evento #{e.id_evento} | "
-                f"Partida {e.id_partida} | "
-                f"{e.descripcion} | "
-                f"{e.fecha_hora}"
+            nuevo = HistorialEvento(
+                id_partida=1,
+                descripcion="Jugador respondió correctamente la pregunta 3"
             )
 
-    except Exception as e:
+            session.add(nuevo)
+            await session.commit()
 
-        session.rollback()
-        print("Error durante la transacción:", e)
+            await session.refresh(nuevo)
 
-    finally:
+            print("Evento registrado correctamente.")
+            print(f"Fecha asignada por SQL Server: {nuevo.fecha_hora}")
 
-        session.close()
-        print("\nSesión ORM cerrada.")
+            print("\n=== CONSULTAR HISTORIAL ===")
+
+            resultado = await session.execute(
+                select(HistorialEvento).order_by(
+                    HistorialEvento.id_evento
+                )
+            )
+
+            eventos = resultado.scalars().all()
+
+            for e in eventos:
+
+                print(
+                    f"Evento #{e.id_evento} | "
+                    f"Partida {e.id_partida} | "
+                    f"{e.descripcion} | "
+                    f"{e.fecha_hora}"
+                )
+
+        except Exception as e:
+
+            await session.rollback()
+            print("Error durante la transacción:", e)
+
+        finally:
+
+            print("\nSesión ORM cerrada.")
 
 
 if __name__ == "__main__":
-    ejecutar_ejemplo()
+    asyncio.run(ejecutar_ejemplo())
