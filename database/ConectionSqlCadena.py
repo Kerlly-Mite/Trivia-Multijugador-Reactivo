@@ -1,8 +1,5 @@
-import pyodbc
-
-
 class SQLServerConnection:
-
+  
     def __init__(
         self,
         server,
@@ -18,7 +15,6 @@ class SQLServerConnection:
         self.password = password
         self.trusted_connection = trusted_connection
         self.conn = None
-
 
     def _build_connection_string(self):
 
@@ -43,16 +39,20 @@ class SQLServerConnection:
                 f"PWD={self.password};"
             )
 
+    async def connect(self):
 
-    def connect(self):
+        import aioodbc
 
         try:
 
             connection_string = self._build_connection_string()
 
-            self.conn = pyodbc.connect(connection_string)
+            self.conn = await aioodbc.connect(
+                dsn=connection_string,
+                autocommit=False
+            )
 
-            print("Conexion exitosa con SQL Server")
+            print("Conexion asincrona exitosa con SQL Server")
 
             return self.conn
 
@@ -64,26 +64,27 @@ class SQLServerConnection:
 
             raise
 
-
-    def execute_query(
+    async def execute_query(
         self,
         query,
         params=None
     ):
 
         if not self.conn:
-            self.connect()
+            await self.connect()
 
         try:
 
-            with self.conn.cursor() as cursor:
+            async with self.conn.cursor() as cursor:
 
                 if params:
-                    cursor.execute(query, params)
+                    await cursor.execute(query, params)
                 else:
-                    cursor.execute(query)
+                    await cursor.execute(query)
 
-                return cursor.fetchall()
+                filas = await cursor.fetchall()
+
+                return filas
 
         except Exception as e:
 
@@ -93,33 +94,31 @@ class SQLServerConnection:
 
             raise
 
-
-    def execute_non_query(
+    async def execute_non_query(
         self,
         query,
         params=None
     ):
 
         if not self.conn:
-            self.connect()
+            await self.connect()
 
         try:
 
-            with self.conn.cursor() as cursor:
+            async with self.conn.cursor() as cursor:
 
                 if params:
-                    cursor.execute(query, params)
+                    await cursor.execute(query, params)
                 else:
-                    cursor.execute(query)
+                    await cursor.execute(query)
 
-                self.conn.commit()
+                await self.conn.commit()
 
                 print("Operacion realizada correctamente")
 
         except Exception as e:
 
-            if self.conn:
-                self.conn.rollback()
+            await self.conn.rollback()
 
             print(
                 f"Error al ejecutar comando: {e}"
@@ -127,12 +126,11 @@ class SQLServerConnection:
 
             raise
 
-
-    def close(self):
+    async def close(self):
 
         if self.conn:
 
-            self.conn.close()
+            await self.conn.close()
 
             print(
                 "Conexion cerrada"

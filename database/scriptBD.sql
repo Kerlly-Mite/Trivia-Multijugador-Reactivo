@@ -38,7 +38,7 @@ CREATE TABLE Ranking (
 GO
 
 
--- Datos de prueba
+-- Datos de insertar prueba
 INSERT INTO Ranking
 (jugador, puntos_totales, partidas_jugadas, victorias)
 VALUES

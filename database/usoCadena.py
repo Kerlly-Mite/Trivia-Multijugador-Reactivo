@@ -1,7 +1,9 @@
+import asyncio
+
 from ConectionSqlCadena import SQLServerConnection
 
 
-def ejecutar_ejemplo():
+async def ejecutar_ejemplo():
 
     db = SQLServerConnection(
         server="localhost",
@@ -22,7 +24,7 @@ def ejecutar_ejemplo():
     )
 
     try:
-        db.execute_non_query(query_insert, datos)
+        await db.execute_non_query(query_insert, datos)
 
     except Exception:
         print("No fue posible registrar el evento.")
@@ -41,7 +43,7 @@ def ejecutar_ejemplo():
 
     try:
 
-        resultados = db.execute_query(query_select)
+        resultados = await db.execute_query(query_select)
 
         for fila in resultados:
 
@@ -56,8 +58,8 @@ def ejecutar_ejemplo():
         print(e)
 
     finally:
-        db.close()
+        await db.close()
 
 
 if __name__ == "__main__":
-    ejecutar_ejemplo()
+    asyncio.run(ejecutar_ejemplo())
