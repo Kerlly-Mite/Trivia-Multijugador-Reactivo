@@ -1,16 +1,17 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from types import MappingProxyType
 
 
-@dataclass
+@dataclass(frozen=True)
 class GameState:
 
     screen: str
 
-    players: list
+    players: tuple
 
-    current_question: dict
+    current_question: MappingProxyType
 
-    scores: dict
+    scores: MappingProxyType
 
     timer: int
 
