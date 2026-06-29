@@ -2,7 +2,7 @@ from reactpy import component, html
 
 
 @component
-def Lobby():
+def Lobby(estado):
 
     return html.div(
 
@@ -11,12 +11,12 @@ def Lobby():
         html.h3("Jugadores conectados"),
 
         html.ul(
-
-            html.li("🟢 Katherine"),
-
-            html.li("🟢 Carlos"),
-
-            html.li("🟢 María")
+            *[
+                html.li(f"🟢 {jugador}")
+                for jugador in estado.players
+            ]
+        ) if len(estado.players) > 0 else html.p(
+            "Todavía no hay jugadores conectados."
         ),
 
         html.p("Esperando el inicio de la partida...")
